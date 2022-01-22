@@ -4,13 +4,14 @@ import "components/Application.scss";
 import DayList from "./DayList";
 import Appointment from "./Appointment";
 import axios from "axios";
-import { getAppointmentsForDay } from "../helpers/selectors";
+import { getAppointmentsForDay, getInterview } from "../helpers/selectors";
 
 export default function Application(props) {
   const [state, setState] = useState({
-    day: "Mondy",
+    day: "Monday",
     days: [],
     appointments: {},
+    interviewers: {},
   });
   const setDay = (day) => setState({ ...state, day });
 
@@ -24,14 +25,24 @@ export default function Application(props) {
         ...prev,
         days: all[0].data,
         appointments: all[1].data,
+        interviewers: all[2].data,
       }));
     });
   }, []);
 
-  const dailyAppointments = getAppointmentsForDay({ ...state }, state.day);
-  let parsedAppointments = dailyAppointments.map((appointment) => (
-    <Appointment key={appointment.id} {...appointment} />
-  ));
+  const dailyAppointments = getAppointmentsForDay(state, state.day);
+  const schedule = dailyAppointments.map((appointment) => {
+    const interview = getInterview(state, appointment.interview);
+    return (
+      <Appointment
+        key={appointment.id}
+        id={appointment.id}
+        time={appointment.time}
+        interview={interview}
+      />
+    );
+  });
+
   return (
     <main className="layout">
       <section className="sidebar">
@@ -51,7 +62,7 @@ export default function Application(props) {
           alt="Lighthouse Labs"
         />
       </section>
-      <section className="schedule">{parsedAppointments}</section>
+      <section className="schedule">{schedule}</section>
     </main>
   );
 }
