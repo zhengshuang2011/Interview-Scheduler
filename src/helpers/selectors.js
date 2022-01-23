@@ -14,8 +14,11 @@ function getInterview(state, interview) {
   if (interview === null) {
     return null;
   }
+  if (interview.interviewerData) {
+    return interview;
+  }
   const interviewerId = interview.interviewer;
-  interview.interviewer = state.interviewers[interviewerId];
+  interview.interviewerData = state.interviewers[interviewerId];
   return interview;
 }
 

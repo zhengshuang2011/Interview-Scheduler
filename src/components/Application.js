@@ -31,8 +31,11 @@ export default function Application(props) {
   }, []);
 
   const dailyAppointments = getAppointmentsForDay(state, state.day);
-  const schedule = dailyAppointments.map((appointment) => {
+  // console.log(dailyAppointments);
+  const schedule = [...dailyAppointments];
+  const final = schedule.map((appointment) => {
     const interview = getInterview(state, appointment.interview);
+    // console.log(interview);
     return (
       <Appointment
         key={appointment.id}
@@ -62,7 +65,7 @@ export default function Application(props) {
           alt="Lighthouse Labs"
         />
       </section>
-      <section className="schedule">{schedule}</section>
+      <section className="schedule">{final}</section>
     </main>
   );
 }
