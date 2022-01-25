@@ -1,12 +1,13 @@
 import React from "react";
 import "components/Appointment/styles.scss";
+import useVisualMode from "hooks/useVisualMode";
 import Header from "./Header";
 import Show from "./Show";
 import Empty from "./Empty";
 import Form from "./Form";
 import Status from "./Status";
-import useVisualMode from "hooks/useVisualMode";
 import Confirm from "./Confirm";
+import Error from "./Error";
 
 const EMPTY = "EMPTY";
 const SHOW = "SHOW";
@@ -15,9 +16,11 @@ const EDIT = "EDIT";
 const CONFIRM = "CONFIRM";
 const DELETING = "DELETING";
 const SAVING = "SAVING";
+const ERROR_SAVE = "ERROR_SAVE";
+const ERROR_DELETE = "ERROR_DELETE";
 
 export default function Appointment(props) {
-  const { id, time, interview, interviewers, bookInterview, cancleInterview } =
+  const { id, time, interview, interviewers, bookInterview, cancelInterview } =
     props;
   const { mode, transition, back } = useVisualMode(interview ? SHOW : EMPTY);
 
@@ -27,16 +30,16 @@ export default function Appointment(props) {
       interviewer,
     };
     transition(SAVING);
-    bookInterview(id, interview).then((res) => {
-      transition(SHOW);
-    });
+    bookInterview(id, interview)
+      .then(() => transition(SHOW))
+      .catch((error) => transition(ERROR_SAVE, true));
   };
 
   const reset = (id) => {
-    transition(DELETING);
-    cancleInterview(id).then((res) => {
-      transition(EMPTY);
-    });
+    transition(DELETING, true);
+    cancelInterview(id)
+      .then(() => transition(EMPTY))
+      .catch((error) => transition(ERROR_DELETE, true));
   };
 
   return (
@@ -78,6 +81,12 @@ export default function Appointment(props) {
       )}
       {mode === SAVING && <Status message="SAVING" />}
       {mode === DELETING && <Status message="DELETING" />}
+      {mode === ERROR_SAVE && (
+        <Error message="Could not save appointment" onClose={() => back()} />
+      )}
+      {mode === ERROR_DELETE && (
+        <Error message="Could not delete appointment" onClose={() => back()} />
+      )}
     </article>
   );
 }
