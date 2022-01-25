@@ -34,7 +34,11 @@ export default function Application(props) {
     });
   }, []);
 
-  const bookInterview = (id, interview) => {
+  const appointmentUrl = (id) => {
+    return `/api/appointments/${id}`;
+  };
+
+  const bookInterview = async (id, interview) => {
     const appointment = {
       ...state.appointments[id],
       interview: { ...interview },
@@ -43,18 +47,34 @@ export default function Application(props) {
       ...state.appointments,
       [id]: appointment,
     };
-    console.log("id", id, "interview", interview);
-    const appointmentUrl = (id) => {
-      return `/api/appointments/${id}`;
-    };
-    return axios.put(appointmentUrl(id), appointment).then((res) => {
-      setState({
-        ...state,
-        appointments,
-      });
+
+    const result = await axios.put(appointmentUrl(id), appointment);
+    setState({
+      ...state,
+      appointments,
     });
+    return result;
   };
 
+  const cancleInterview = async (id) => {
+    const result = await axios.delete(appointmentUrl(id));
+    // console.log("id", id, "appointment", state.appointments);
+    const appointment = {
+      ...state.appointments[id],
+      interview: null,
+    };
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment,
+    };
+    setState({
+      ...state,
+      appointments,
+    });
+    return result;
+  };
+
+  // console.log(state.appointments);
   const dailyAppointments = getAppointmentsForDay(state, state.day);
   const dailyInterviewers = getInterviewersForDay(state, state.day);
   // console.log(dailyAppointments)；
@@ -69,6 +89,7 @@ export default function Application(props) {
         interview={interview}
         interviewers={dailyInterviewers}
         bookInterview={bookInterview}
+        cancleInterview={cancleInterview}
       />
     );
   });
