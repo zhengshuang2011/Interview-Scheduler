@@ -23,7 +23,7 @@ export default function Application(props) {
     Promise.all([
       axios.get("/api/days"),
       axios.get("/api/appointments"),
-      axios.get("api/interviewers"),
+      axios.get("/api/interviewers"),
     ]).then((all) => {
       setState((prev) => ({
         ...prev,
@@ -34,11 +34,31 @@ export default function Application(props) {
     });
   }, []);
 
+  const bookInterview = (id, interview) => {
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview },
+    };
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment,
+    };
+    console.log("id", id, "interview", interview);
+    const appointmentUrl = (id) => {
+      return `/api/appointments/${id}`;
+    };
+    return axios.put(appointmentUrl(id), appointment).then((res) => {
+      setState({
+        ...state,
+        appointments,
+      });
+    });
+  };
+
   const dailyAppointments = getAppointmentsForDay(state, state.day);
   const dailyInterviewers = getInterviewersForDay(state, state.day);
-  // console.log(dailyAppointments);
-  const schedule = [...dailyAppointments];
-  const final = schedule.map((appointment) => {
+  // console.log(dailyAppointments)；
+  const schedule = dailyAppointments.map((appointment) => {
     const interview = getInterview(state, appointment.interview);
     // console.log(interview);
     return (
@@ -48,6 +68,7 @@ export default function Application(props) {
         time={appointment.time}
         interview={interview}
         interviewers={dailyInterviewers}
+        bookInterview={bookInterview}
       />
     );
   });
@@ -71,7 +92,7 @@ export default function Application(props) {
           alt="Lighthouse Labs"
         />
       </section>
-      <section className="schedule">{final}</section>
+      <section className="schedule">{schedule}</section>
     </main>
   );
 }
