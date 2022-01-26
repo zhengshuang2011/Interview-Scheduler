@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getAppointmentsForDay } from "helpers/selectors";
 import { useState, useEffect } from "react";
 
 export default function useApplicationData() {
@@ -29,7 +30,7 @@ export default function useApplicationData() {
     return `/api/appointments/${id}`;
   };
 
-  const bookInterview = async (id, interview) => {
+  const bookInterview = (id, interview, day) => {
     const appointment = {
       ...state.appointments[id],
       interview: { ...interview },
@@ -38,16 +39,17 @@ export default function useApplicationData() {
       ...state.appointments,
       [id]: appointment,
     };
-
-    const result = await axios.put(appointmentUrl(id), appointment);
-    setState({
-      ...state,
-      appointments,
+    return axios.put(appointmentUrl(id), appointment).then(() => {
+      const days = changeSpots(state, day);
+      setState({
+        ...state,
+        days,
+        appointments,
+      });
     });
-    return result;
   };
 
-  const cancelInterview = async (id) => {
+  const cancelInterview = (id, day) => {
     const appointment = {
       ...state.appointments[id],
       interview: null,
@@ -57,12 +59,37 @@ export default function useApplicationData() {
       [id]: appointment,
     };
 
-    const result = await axios.delete(appointmentUrl(id));
-    setState({
-      ...state,
-      appointments,
+    return axios.delete(appointmentUrl(id)).then(() => {
+      const days = changeSpots(state, day, true);
+      setState({
+        ...state,
+        days,
+        appointments,
+      });
     });
-    return result;
+  };
+
+  const changeSpots = (state, name, increase) => {
+    const currentDay = state.days.filter((day) => day.name === name)[0];
+    const currentAppoitments = getAppointmentsForDay(state, name);
+
+    const noInterview = currentAppoitments.filter(
+      (appointment) => !appointment.interview
+    );
+    const spots = noInterview.length;
+    const id = currentDay.id;
+    const updateDay = {
+      ...currentDay,
+      spots: increase ? spots + 1 : spots - 1,
+    };
+    const days = state.days.map((day) => {
+      if (day.id === id) {
+        return updateDay;
+      }
+      return day;
+    });
+
+    return days;
   };
 
   return { state, setDay, bookInterview, cancelInterview };

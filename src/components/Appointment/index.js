@@ -20,8 +20,15 @@ const ERROR_SAVE = "ERROR_SAVE";
 const ERROR_DELETE = "ERROR_DELETE";
 
 export default function Appointment(props) {
-  const { id, time, interview, interviewers, bookInterview, cancelInterview } =
-    props;
+  const {
+    id,
+    time,
+    day,
+    interview,
+    interviewers,
+    bookInterview,
+    cancelInterview,
+  } = props;
   const { mode, transition, back } = useVisualMode(interview ? SHOW : EMPTY);
 
   const save = (name, interviewer) => {
@@ -30,14 +37,19 @@ export default function Appointment(props) {
       interviewer,
     };
     transition(SAVING);
-    bookInterview(id, interview)
-      .then(() => transition(SHOW))
-      .catch((error) => transition(ERROR_SAVE, true));
+    bookInterview(id, interview, day)
+      .then(() => {
+        transition(SHOW);
+      })
+      .catch((error) => {
+        transition(ERROR_SAVE, true);
+        console.log(error);
+      });
   };
 
   const reset = (id) => {
     transition(DELETING, true);
-    cancelInterview(id)
+    cancelInterview(id, day)
       .then(() => transition(EMPTY))
       .catch((error) => transition(ERROR_DELETE, true));
   };
