@@ -9,17 +9,19 @@ export default function Form(props) {
   const [interviewerName, setInterviewerName] = useState(interviewer || null);
   const [error, setError] = useState("");
 
+  //Validate: if nothing input in studentName field, then the form will not be submitted, show "Student name cannot be blank";
+  //          if interviewer is not selected, then interviewerName will be null;
   const validate = () => {
     if (studentName === "") {
       setError("Student name cannot be blank");
       return;
     }
+
     setError("");
     if (!interviewerName) {
       onSave(studentName, null);
       return;
     }
-
     onSave(studentName, interviewerName);
   };
 

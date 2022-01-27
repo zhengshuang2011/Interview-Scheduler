@@ -36,7 +36,9 @@ export default function Appointment(props) {
       student: name,
       interviewer,
     };
+
     transition(SAVING);
+
     bookInterview(id, interview, day)
       .then(() => {
         transition(SHOW);
@@ -59,7 +61,7 @@ export default function Appointment(props) {
       {time && <Header time={time} />}
       {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}
       {mode === SHOW && (
-        <Show
+        <Show //Show mode: booked interview with student name and interviewerName/null.
           student={interview.student}
           interviewer={interview.interviewerData}
           onEdit={() => transition(EDIT)}
@@ -67,7 +69,7 @@ export default function Appointment(props) {
         />
       )}
       {mode === CREATE && (
-        <Form
+        <Form //Form create mode : Without student name. With interviewers List
           interviewers={interviewers}
           id={id}
           onSave={save}
@@ -75,7 +77,7 @@ export default function Appointment(props) {
         />
       )}
       {mode === EDIT && (
-        <Form
+        <Form //Form edit mode : With student name. With interviewers List(can be selected or not selected)
           student={interview.student}
           interviewer={interview.interviewer}
           interviewers={interviewers}

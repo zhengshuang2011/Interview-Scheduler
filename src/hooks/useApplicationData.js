@@ -26,51 +26,9 @@ export default function useApplicationData() {
     });
   }, []);
 
-  const appointmentUrl = (id) => {
-    return `/api/appointments/${id}`;
-  };
-
-  const bookInterview = (id, interview, day) => {
-    console.log(id, interview);
-    const appointment = {
-      ...state.appointments[id],
-      interview: { ...interview },
-    };
-    const appointments = {
-      ...state.appointments,
-      [id]: appointment,
-    };
-    return axios.put(appointmentUrl(id), appointment).then(() => {
-      const days = changeSpots(state, day);
-      setState({
-        ...state,
-        days,
-        appointments,
-      });
-    });
-  };
-
-  const cancelInterview = (id, day) => {
-    const appointment = {
-      ...state.appointments[id],
-      interview: null,
-    };
-    const appointments = {
-      ...state.appointments,
-      [id]: appointment,
-    };
-
-    return axios.delete(appointmentUrl(id)).then(() => {
-      const days = changeSpots(state, day, true);
-      setState({
-        ...state,
-        days,
-        appointments,
-      });
-    });
-  };
-
-  const changeSpots = (state, name, increase) => {
+  //To check selected day's spots and make change if book or cancel an interview.
+  //Returned: state.days ==> updated days
+  const changeSpotsForDays = (state, name, increase) => {
     const currentDay = state.days.find((day) => day.name === name);
 
     const currentAppoitments = getAppointmentsForDay(state, name);
@@ -87,6 +45,52 @@ export default function useApplicationData() {
     const days = state.days.map((day) => (day.id === id ? updateDay : day));
 
     return days;
+  };
+
+  //Created a helper function to shorter URL for appointments/:id
+  const appointmentUrl = (id) => {
+    return `/api/appointments/${id}`;
+  };
+
+  //A user can book an interview in an empty appointment slot
+  const bookInterview = (id, interview, day) => {
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview },
+    };
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment,
+    };
+    return axios.put(appointmentUrl(id), appointment).then(() => {
+      const days = changeSpotsForDays(state, day);
+      setState({
+        ...state,
+        days,
+        appointments,
+      });
+    });
+  };
+
+  //A user can cancel an existing interview.
+  const cancelInterview = (id, day) => {
+    const appointment = {
+      ...state.appointments[id],
+      interview: null,
+    };
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment,
+    };
+
+    return axios.delete(appointmentUrl(id)).then(() => {
+      const days = changeSpotsForDays(state, day, true);
+      setState({
+        ...state,
+        days,
+        appointments,
+      });
+    });
   };
 
   return { state, setDay, bookInterview, cancelInterview };

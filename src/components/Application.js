@@ -1,6 +1,7 @@
 import React from "react";
 
 import "components/Application.scss";
+
 import DayList from "./DayList";
 import Appointment from "./Appointment";
 import {
@@ -14,28 +15,25 @@ export default function Application(props) {
   const { state, setDay, bookInterview, cancelInterview } =
     useApplicationData();
 
-  const dailyAppointments = getAppointmentsForDay(state, state.day);
-  const dailyInterviewers = getInterviewersForDay(state, state.day);
-
-  const schedule = dailyAppointments.map((appointment) => {
-    return (
+  //Show selected day's booking schedule
+  const schedule = getAppointmentsForDay(state, state.day).map(
+    (appointment) => (
       <Appointment
         key={appointment.id}
         id={appointment.id}
         time={appointment.time}
         interview={getInterview(state, appointment.interview)}
-        interviewers={dailyInterviewers}
+        interviewers={getInterviewersForDay(state, state.day)}
         bookInterview={bookInterview}
         cancelInterview={cancelInterview}
         day={state.day}
       />
-    );
-  });
+    )
+  );
 
   return (
     <main className="layout">
       <section className="sidebar">
-        {/* Replace this with the sidebar elements during the "Project Setup & Familiarity" activity. */}
         <img
           className="sidebar--centered"
           src="images/logo.png"

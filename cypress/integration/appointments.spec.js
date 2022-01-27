@@ -5,7 +5,7 @@ describe("Appointment", () => {
     cy.visit("/");
   });
 
-  xit("should book an interview", () => {
+  it("should book an interview", () => {
     cy.contains("[data-testid=day]", "Tuesday").click();
 
     cy.get("[alt=Add]").first().click();
@@ -19,7 +19,7 @@ describe("Appointment", () => {
     cy.contains(".appointment__card--show", "Sylvia Palmer");
   });
 
-  xit("should edit an interview", () => {
+  it("should edit an interview", () => {
     cy.contains("Monday");
     cy.get("[alt=Edit]").first().click({ force: true });
 
