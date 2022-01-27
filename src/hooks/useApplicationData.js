@@ -71,24 +71,20 @@ export default function useApplicationData() {
   };
 
   const changeSpots = (state, name, increase) => {
-    const currentDay = state.days.filter((day) => day.name === name)[0];
-    const currentAppoitments = getAppointmentsForDay(state, name);
+    const currentDay = state.days.find((day) => day.name === name);
 
+    const currentAppoitments = getAppointmentsForDay(state, name);
     const noInterview = currentAppoitments.filter(
       (appointment) => !appointment.interview
     );
     const spots = noInterview.length;
+
     const id = currentDay.id;
     const updateDay = {
       ...currentDay,
       spots: increase ? spots + 1 : spots - 1,
     };
-    const days = state.days.map((day) => {
-      if (day.id === id) {
-        return updateDay;
-      }
-      return day;
-    });
+    const days = state.days.map((day) => (day.id === id ? updateDay : day));
 
     return days;
   };
