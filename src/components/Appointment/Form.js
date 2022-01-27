@@ -14,7 +14,7 @@ export default function Form(props) {
       setError("Student name cannot be blank");
       return;
     }
-
+    setError("");
     if (!interviewerName) {
       onSave(studentName, null);
       return;
@@ -24,6 +24,7 @@ export default function Form(props) {
   };
 
   const reset = () => {
+    setError("");
     setStudentName("");
     setInterviewerName(null);
   };
