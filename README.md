@@ -6,7 +6,7 @@ Using the latest tools and techniques, we build and test a React application tha
 
 Final Interview Scheduler Project Home Page
 
-!["Home Page"](./public/images/Interview Scheduler - final.gif)
+!["Home Page"](./public/images/InterviewScheduler.gif)
 
 ## Dependencies
 
