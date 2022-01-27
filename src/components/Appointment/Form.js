@@ -20,7 +20,7 @@ export default function Form(props) {
       return;
     }
 
-    onSave(studentName, interviewer);
+    onSave(studentName, interviewerName);
   };
 
   const reset = () => {
