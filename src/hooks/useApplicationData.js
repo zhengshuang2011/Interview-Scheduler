@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getAppointmentsForDay } from "helpers/selectors";
 import { useState, useEffect } from "react";
 
 export default function useApplicationData() {
@@ -28,22 +27,20 @@ export default function useApplicationData() {
 
   //To check selected day's spots and make change if book or cancel an interview.
   //Returned: state.days ==> updated days
-  const changeSpotsForDays = (state, name, increase) => {
-    const currentDay = state.days.find((day) => day.name === name);
-
-    const currentAppoitments = getAppointmentsForDay(state, name);
-    const noInterview = currentAppoitments.filter(
-      (appointment) => !appointment.interview
-    );
-    const spots = noInterview.length;
-
-    const id = currentDay.id;
+  const SpotsForDays = (state, appointments) => {
+    const currentDay = state.days.find((day) => day.name === state.day);
+    let spots = 0;
+    for (let id of currentDay.appointments) {
+      if (!appointments[id].interview) {
+        spots++;
+      }
+    }
+    const dayId = currentDay.id;
     const updateDay = {
       ...currentDay,
-      spots: increase ? spots + 1 : spots - 1,
+      spots,
     };
-    const days = state.days.map((day) => (day.id === id ? updateDay : day));
-
+    const days = state.days.map((day) => (day.id === dayId ? updateDay : day));
     return days;
   };
 
@@ -53,7 +50,7 @@ export default function useApplicationData() {
   };
 
   //A user can book an interview in an empty appointment slot
-  const bookInterview = (id, interview, day) => {
+  const bookInterview = (id, interview) => {
     const appointment = {
       ...state.appointments[id],
       interview: { ...interview },
@@ -63,7 +60,7 @@ export default function useApplicationData() {
       [id]: appointment,
     };
     return axios.put(appointmentUrl(id), appointment).then(() => {
-      const days = changeSpotsForDays(state, day);
+      const days = SpotsForDays(state, appointments);
       setState({
         ...state,
         days,
@@ -73,7 +70,7 @@ export default function useApplicationData() {
   };
 
   //A user can cancel an existing interview.
-  const cancelInterview = (id, day) => {
+  const cancelInterview = (id) => {
     const appointment = {
       ...state.appointments[id],
       interview: null,
@@ -84,7 +81,7 @@ export default function useApplicationData() {
     };
 
     return axios.delete(appointmentUrl(id)).then(() => {
-      const days = changeSpotsForDays(state, day, true);
+      const days = SpotsForDays(state, appointments);
       setState({
         ...state,
         days,
