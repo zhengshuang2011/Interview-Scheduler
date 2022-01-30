@@ -8,6 +8,9 @@ Final Interview Scheduler Project Home Page
 
 !["Home Page"](./public/images/InterviewScheduler.gif)
 
+Interview Scheduler Project Error Message
+!["Error Page"](./public/images/ErrorPage.jpeg)
+
 ## Dependencies
 
 - axios
